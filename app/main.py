@@ -22,7 +22,7 @@ class Type(Command):
 
     def run(self, args):
         if args in self.registry:
-            print(f"{args} is a shell builtin command")
+            print(f"{args} is a shell builtin")
         else:
             print(f"{args}: not found")
 
