@@ -1,4 +1,7 @@
 import sys
+import os
+
+from app.locator import _cmd_locator
 
 
 class Command:
@@ -24,7 +27,11 @@ class Type(Command):
         if args in self.registry:
             print(f"{args} is a shell builtin")
         else:
-            print(f"{args}: not found")
+            path = _cmd_locator(args)
+            if path:
+                print(f"{args} is {path}")
+            else:
+                print(f"{args}: not found")
 
 
 def main():
