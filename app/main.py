@@ -1,5 +1,5 @@
 import sys
-
+import os
 from app.utils import _cmd_locator, _run_ext_cmd
 
 
@@ -11,6 +11,11 @@ class Command:
 class Echo(Command):
     def run(self, args: str):
         print(args)
+
+
+class Pwd(Command):
+    def run(self, args: str):
+        print(os.getcwd())
 
 
 class Exit(Command):
@@ -38,6 +43,7 @@ def main():
     registry = {
         "echo": Echo(),
         "exit": Exit(),
+        "pwd": Pwd(),
     }
     # making this a key in registry
     registry["type"] = Type(registry)
