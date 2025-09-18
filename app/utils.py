@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import stat
+import subprocess
 
 
 def _cmd_locator(cmd: str):
@@ -25,3 +26,12 @@ def _cmd_locator(cmd: str):
                     except OSError as e:
                         print(f"Error accessing {filepath}: {e}")
     return None
+
+
+def _run_ext_cmd(cmd: str, args: str):
+    # Split args into list for subprocess
+    filepath = _cmd_locator(cmd)
+    if not filepath:
+        print(f"{cmd}: command not found")
+
+    subprocess.run([filepath], args=args.split())

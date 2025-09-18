@@ -1,7 +1,6 @@
 import sys
-import os
 
-from app.locator import _cmd_locator
+from app.utils import _cmd_locator, _run_ext_cmd
 
 
 class Command:
@@ -40,7 +39,7 @@ def main():
         "echo": Echo(),
         "exit": Exit(),
     }
-    # making this a key in register
+    # making this a key in registry
     registry["type"] = Type(registry)
 
     while True:
@@ -53,7 +52,10 @@ def main():
         if cmd in registry:
             registry[cmd].run(args)
         else:
-            print(f"{cmd}: command not found")
+            try:
+                _run_ext_cmd(cmd, args)
+            except Exception as e:
+                print(f"{cmd}: command not found")
 
 
 if __name__ == "__main__":
