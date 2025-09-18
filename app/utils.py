@@ -36,7 +36,7 @@ def _run_ext_cmd(cmd: str, args: str):
         print(f"{cmd}: command not found")
 
     try:
-        argv = [filepath] + (args.split() if args else [])
-        subprocess.run(argv)
+        argv = [cmd] + (args.split() if args else [])
+        subprocess.run(argv, executable=filepath)
     except PermissionError:
         print(f"{cmd}: permission denied")
