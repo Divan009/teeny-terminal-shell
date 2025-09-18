@@ -18,6 +18,14 @@ class Pwd(Command):
         print(os.getcwd())
 
 
+class Cd(Command):
+    def run(self, args: str):
+        try:
+            os.chdir(args)
+        except FileNotFoundError as e:
+            print(f"cd: {args}: No such file or directory")
+
+
 class Exit(Command):
     def run(self, args: str):
         sys.exit(0)
@@ -44,6 +52,7 @@ def main():
         "echo": Echo(),
         "exit": Exit(),
         "pwd": Pwd(),
+        "cd": Cd(),
     }
     # making this a key in registry
     registry["type"] = Type(registry)
