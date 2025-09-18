@@ -29,6 +29,8 @@ def _cmd_locator(cmd: str):
 
 
 def _run_ext_cmd(cmd: str, args: str):
+    print(cmd, args)
+    return
     # Split args into list for subprocess
     filepath = _cmd_locator(cmd)
     print(filepath)
