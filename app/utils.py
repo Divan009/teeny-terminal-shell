@@ -31,6 +31,7 @@ def _cmd_locator(cmd: str):
 def _run_ext_cmd(cmd: str, args: str):
     # Split args into list for subprocess
     filepath = _cmd_locator(cmd)
+    print(filepath)
     if not filepath:
         print(f"{cmd}: command not found")
 
