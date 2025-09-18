@@ -53,7 +53,7 @@ def main():
             registry[cmd].run(args)
         else:
             try:
-                _run_ext_cmd(cmd, args)
+                _run_ext_cmd(cmd, *rest)
             except Exception as e:
                 print(f"{cmd}: command not found")
 

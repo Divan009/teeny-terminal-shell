@@ -29,12 +29,14 @@ def _cmd_locator(cmd: str):
 
 
 def _run_ext_cmd(cmd: str, args: str):
-    print(cmd, args)
-    return
     # Split args into list for subprocess
     filepath = _cmd_locator(cmd)
-    print(filepath)
+
     if not filepath:
         print(f"{cmd}: command not found")
 
-    subprocess.run([filepath], args=args.split())
+    try:
+        argv = [filepath] + (args.split() if args else [])
+        subprocess.run(argv)
+    except PermissionError:
+        print(f"{cmd}: permission denied")
