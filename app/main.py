@@ -1,6 +1,7 @@
 import sys
 import os
 from app.utils import _cmd_locator, _run_ext_cmd
+from pathlib import Path
 
 
 class Command:
@@ -20,6 +21,11 @@ class Pwd(Command):
 
 class Cd(Command):
     def run(self, args: str):
+
+        if args == "~":
+            home_directory = Path.home()
+            args = home_directory
+
         try:
             os.chdir(args)
         except FileNotFoundError as e:
