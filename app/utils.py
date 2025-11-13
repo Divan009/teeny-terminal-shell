@@ -1,22 +1,24 @@
 import os
-from pathlib import Path
 import stat
-import subprocess
+from os import stat_result
 
 
-def _cmd_locator(cmd: str):
-    path = os.getenv("PATH")
-    potential_dir = path.split(":")
+def _cmd_locator(cmd: str) -> str | None:
+    path: str | None = os.getenv("PATH")
+    potential_dir: list[str] = path.split(":")
 
     for dir in potential_dir:
+        filenames: list[str]
+        dirnames: list[str]
+        dirpath: str
         for dirpath, dirnames, filenames in os.walk(dir):
             for filename in filenames:
                 if filename == cmd:
                     try:
                         filepath = os.path.join(dirpath, filename)
 
-                        file_stat = os.stat(filepath)
-                        mode = file_stat.st_mode
+                        file_stat: stat_result = os.stat(filepath)
+                        mode: int = file_stat.st_mode
                         if (
                             mode & stat.S_IXUSR
                             or mode & stat.S_IXGRP
@@ -28,15 +30,3 @@ def _cmd_locator(cmd: str):
     return None
 
 
-def _run_ext_cmd(cmd: str, args: str):
-    # Split args into list for subprocess
-    filepath = _cmd_locator(cmd)
-
-    if not filepath:
-        print(f"{cmd}: command not found")
-
-    try:
-        argv = [cmd] + (args.split() if args else [])
-        subprocess.run(argv, executable=filepath)
-    except PermissionError:
-        print(f"{cmd}: permission denied")

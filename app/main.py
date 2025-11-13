@@ -1,82 +1,20 @@
-import sys
-import os
-from app.utils import _cmd_locator, _run_ext_cmd
-from pathlib import Path
-
-
-class Command:
-    def run(self, args: str):
-        raise NotImplementedError
-
-
-class Echo(Command):
-    def run(self, args: str):
-        print(args)
-
-
-class Pwd(Command):
-    def run(self, args: str):
-        print(os.getcwd())
-
-
-class Cd(Command):
-    def run(self, args: str):
-
-        if args == "~":
-            home_directory = Path.home()
-            args = home_directory
-
-        try:
-            os.chdir(args)
-        except FileNotFoundError as e:
-            print(f"cd: {args}: No such file or directory")
-
-
-class Exit(Command):
-    def run(self, args: str):
-        sys.exit(0)
-
-
-class Type(Command):
-    def __init__(self, registry):
-        self.registry = registry
-
-    def run(self, args):
-        if args in self.registry:
-            print(f"{args} is a shell builtin")
-        else:
-            path = _cmd_locator(args)
-            if path:
-                print(f"{args} is {path}")
-            else:
-                print(f"{args}: not found")
+from app.cmd_exec import CmdExec
 
 
 def main():
-    # Wait for user input
-    registry = {
-        "echo": Echo(),
-        "exit": Exit(),
-        "pwd": Pwd(),
-        "cd": Cd(),
-    }
-    # making this a key in registry
-    registry["type"] = Type(registry)
+    executor = CmdExec()
 
     while True:
-        command = input("$ ").strip()
-        if not command:
+        try:
+            input_line = input("$ ")
+        except EOFError:
+            break  # exit gracefully on Ctrl+D
+        except KeyboardInterrupt:
+            print()  # move to new line on Ctrl+C
             continue
-        cmd, *rest = command.split(" ", 1)
-        args = rest[0] if rest else ""
 
-        if cmd in registry:
-            registry[cmd].run(args)
-        else:
-            try:
-                _run_ext_cmd(cmd, *rest)
-            except Exception as e:
-                print(f"{cmd}: command not found")
+        exit_code = executor.execute(input_line)
+        # return exit_code
 
 
 if __name__ == "__main__":
