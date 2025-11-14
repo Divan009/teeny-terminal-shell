@@ -26,13 +26,22 @@ class CmdParser:
         i = 0
 
         while i < len(args):
-            if not(in_single_quote or in_double_quote) and args[i] == "\\":
-                i += 1
-                if i < len(args):
-                    # take any char - space, quote  etc
-                    current += args[i]
+            # backslash outside any quotes: escape next char
+            if not in_single_quote and not in_double_quote and args[i] == "\\":
+                if i + 1 < len(args):
+                    i += 1
+                    current += args[i]  # take next char literally
                 else:
-                    # lone backslash at end -> treat as literal backslash
+                    current += "\\"
+
+            # backslash *inside double quotes*:
+            # only \" -> " and \\ -> \
+            elif in_double_quote and args[i]  == "\\":
+                if i + 1 < len(args) and args[i + 1] in ['"', '\\']:
+                    i += 1
+                    current += args[i]  # add " or \
+                else:
+                    # for other cases, keep the backslash literally
                     current += "\\"
 
             elif args[i] == "'" and not in_double_quote:
