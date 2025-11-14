@@ -19,14 +19,21 @@ class CmdParser:
 
         current = ""
         in_single_quote = False
+        in_double_quote = False
+
         result = []
 
         i = 0
 
         while i < len(args):
-            if args[i] == "'":
+
+            if args[i] == "'" and not in_double_quote:
                 in_single_quote = not in_single_quote
-            elif args[i].isspace() and not in_single_quote:
+
+            elif args[i] == '"' and not in_single_quote:
+                in_double_quote = not in_double_quote
+
+            elif args[i].isspace() and not in_single_quote and not in_double_quote:
                 if current != "":
                     result.append(current)
                     current = ""
