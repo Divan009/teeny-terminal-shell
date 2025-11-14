@@ -26,8 +26,16 @@ class CmdParser:
         i = 0
 
         while i < len(args):
+            if not(in_single_quote or in_double_quote) and args[i] == "\\":
+                i += 1
+                if i < len(args):
+                    # take any char - space, quote  etc
+                    current += args[i]
+                else:
+                    # lone backslash at end -> treat as literal backslash
+                    current += "\\"
 
-            if args[i] == "'" and not in_double_quote:
+            elif args[i] == "'" and not in_double_quote:
                 in_single_quote = not in_single_quote
 
             elif args[i] == '"' and not in_single_quote:
@@ -37,8 +45,8 @@ class CmdParser:
                 if current != "":
                     result.append(current)
                     current = ""
+
             else:
-                # if args[i] != "'":
                 current += args[i]
             i += 1
 
