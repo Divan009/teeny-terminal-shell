@@ -8,7 +8,7 @@ from app.utils import _cmd_locator
 
 
 class Command:
-    def run(self, args: str):
+    def run(self, args: list[str]):
         raise NotImplementedError
 
     def name(self) -> str:
@@ -16,15 +16,15 @@ class Command:
 
 
 class Echo(Command):
-    def run(self, args: str):
-        print(args)
+    def run(self, args: list[str]):
+        print(" ".join(args))
 
     def name(self) -> str:
         return "echo"
 
 
 class Pwd(Command):
-    def run(self, args: str):
+    def run(self, args: list[str]):
         print(os.getcwd())
 
     def name(self) -> str:
@@ -32,12 +32,12 @@ class Pwd(Command):
 
 
 class Cd(Command):
-    def run(self, args: str):
+    def run(self, args: list[str]):
 
-        if not args or args == "~":
+        if not args or args[0] == "~":
             target = Path.home()
         else:
-            target = Path(args)
+            target = Path(" ".join(args))
 
         try:
             os.chdir(target)
@@ -49,7 +49,7 @@ class Cd(Command):
 
 
 class Exit(Command):
-    def run(self, args: str):
+    def run(self, args: list[str]):
         sys.exit(0)
 
     def name(self) -> str:
@@ -60,15 +60,20 @@ class Type(Command):
     def __init__(self, registry: BuiltinRegistry):
         self.registry = registry
 
-    def run(self, args):
-        if self.registry.is_builtin(args):
-            print(f"{args} is a shell builtin")
+    def run(self, args: list[str]):
+        if not args:
+            return
+
+        name = args[0]
+
+        if self.registry.is_builtin(name):
+            print(f"{name} is a shell builtin")
         else:
-            path = _cmd_locator(args)
+            path = _cmd_locator(name)
             if path:
-                print(f"{args} is {path}")
+                print(f"{name} is {path}")
             else:
-                print(f"{args}: not found")
+                print(f"{name}: not found")
 
     def name(self) -> str:
         return "type"
