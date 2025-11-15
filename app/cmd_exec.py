@@ -19,18 +19,24 @@ class CmdExec:
     def execute(self, input_line: str):
         args: list[str]
         cmd: str
+
+        if input_line is None or len(input_line) == 0:
+            return 0
+
         cmd, args = self.parser.parse_input(input_line)
+
         if self.registry.is_builtin(cmd):
             builtin_cmd = self.registry.get(cmd)
             return builtin_cmd.run(args)
+
         return self._run_ext_cmd(cmd, args)
 
     def _run_ext_cmd(self, cmd: str, args: list[str]):
         """
-
         :type args: str
         :type cmd: str
         """
+
         # Split args into list for subprocess
         filepath = _cmd_locator(cmd)
 

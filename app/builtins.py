@@ -56,6 +56,26 @@ class Exit(Command):
         return "exit"
 
 
+# class Cat(Command):
+#     def run(self, args: list[str]):
+#         if not args:
+#             print("cat: missing file operand")
+#
+#         for path in args:
+#             try:
+#                 with open(path, "r", encoding="utf-8") as f:
+#                     print(f.read(), end="")
+#             except FileNotFoundError:
+#                 print(f"cat: {path}: No such file")
+#             except PermissionError:
+#                 print(f"cat: {path}: Permission denied")
+#             except Exception as e:
+#                 print(f"cat: error reading {path}: {e}")
+#
+#     def name(self) -> str:
+#         return "cat"
+
+
 class Type(Command):
     def __init__(self, registry: BuiltinRegistry):
         self.registry = registry
@@ -90,6 +110,7 @@ class BuiltinRegistry:
         self.register(Echo())
         self.register(Pwd())
         self.register(Cd())
+        # self.register(Cat())
         self.register(Type(self))
 
     def register(self, cmd: Command):
