@@ -1,7 +1,6 @@
 import subprocess
 
 from app.builtins import BuiltinRegistry
-from app.parser import CmdParser
 from app.utils import _cmd_locator
 
 
@@ -9,22 +8,12 @@ class CmdExec:
     """
     Command Executor will execute command
     """
-    parser: CmdParser
     registry: BuiltinRegistry
 
     def __init__(self) -> None:
         self.registry = BuiltinRegistry()
-        self.parser = CmdParser()
 
-    def execute(self, input_line: str):
-        args: list[str]
-        cmd: str
-
-        if input_line is None or len(input_line) == 0:
-            return 0
-
-        cmd, args = self.parser.parse_input(input_line)
-
+    def execute(self, cmd: str, args: list[str]) -> int:
         if self.registry.is_builtin(cmd):
             builtin_cmd = self.registry.get(cmd)
             return builtin_cmd.run(args)

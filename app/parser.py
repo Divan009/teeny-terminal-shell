@@ -2,14 +2,14 @@ from typing import Any
 
 
 class CmdParser:
-    def parse_input(self, input_line: str) -> int | tuple[str, list[str] | Any]:
+    def parse_input(self, input_line: str):
         if not input_line.strip():
-            return 0
+            return None
 
         # Parse the whole line into tokens
         tokens = self.parse_args(input_line)
         if not tokens:
-            return 0
+            return None
 
         cmd, *args = tokens
         return self.check_cmd(cmd), args
