@@ -1,9 +1,10 @@
 import os
-import sys
+import readline
 from typing import Any
 
 from app.cmd_exec import CmdExec
 from app.parser import CmdParser
+from app.utils import custom_completer
 
 
 class Shell:
@@ -14,6 +15,9 @@ class Shell:
         self.running = True
         self.parser = CmdParser()
         self.executor = CmdExec()
+
+        readline.set_completer(custom_completer)
+        readline.parse_and_bind("tab: complete")
 
     def run_shell(self):
         while self.running:
@@ -33,11 +37,8 @@ class Shell:
     def _parse_user_input(self) -> int | tuple[str, list[str] | Any] | None:
         PROMPT: str = "$ "
 
-        sys.stdout.write(PROMPT)
-        sys.stdout.flush()
-
         try:
-            input_line = sys.stdin.readline()
+            input_line = input(PROMPT)
 
             if input_line == "":
                 self.running = False

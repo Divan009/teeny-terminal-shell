@@ -1,6 +1,8 @@
 import os
 import stat
 from os import stat_result
+from typing import Any
+
 
 
 def _cmd_locator(cmd: str) -> str | None:
@@ -30,3 +32,14 @@ def _cmd_locator(cmd: str) -> str | None:
     return None
 
 
+def custom_completer(text, state) -> Any | None:
+    from app.builtins import BuiltinRegistry
+
+    all_cmds_registery = BuiltinRegistry()
+
+    options = all_cmds_registery.list_commands()
+    matches = [s for s in options if s.startswith(text)]
+
+    if state < len(matches):
+        return matches[state] + " "
+    return None
