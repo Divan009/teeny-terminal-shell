@@ -49,7 +49,7 @@ def find_all_ext_cmd_in_path() -> list[str]:
     path: str | None = os.getenv("PATH")
 
     global _EXTERNAL_COMMANDS
-    if _EXTERNAL_COMMANDS:
+    if _EXTERNAL_COMMANDS is not None:
         return _EXTERNAL_COMMANDS
 
     potential_dir: list[str] = path.split(":")
@@ -89,9 +89,13 @@ def custom_completer(text, state) -> Any | None:
     external_commands = find_all_ext_cmd_in_path()
     builtin_commands = all_cmds_registry.list_commands()
 
-    options = external_commands + builtin_commands
+    options = sorted(set(external_commands + builtin_commands))
     matches = [s for s in options if s.startswith(text)]
 
-    if state < len(matches):
-        return matches[state] + " "
-    return None
+    if state >= len(matches):
+        return None
+
+    if len(matches) == 1:
+        return matches[0] + " "
+
+    return matches[state]
