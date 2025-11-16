@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 import sys
 
-from app.utils import _cmd_locator
+from app.utils import ext_cmd_locator
 
 
 class Command:
@@ -69,7 +69,7 @@ class Type(Command):
         if self.registry.is_builtin(name):
             print(f"{name} is a shell builtin")
         else:
-            path = _cmd_locator(name)
+            path = ext_cmd_locator(name)
             if path:
                 print(f"{name} is {path}")
             else:

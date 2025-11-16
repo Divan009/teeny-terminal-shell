@@ -1,7 +1,7 @@
 import subprocess
 
 from app.builtins import BuiltinRegistry
-from app.utils import _cmd_locator
+from app.utils import ext_cmd_locator
 
 
 class CmdExec:
@@ -27,7 +27,7 @@ class CmdExec:
         """
 
         # Split args into list for subprocess
-        filepath = _cmd_locator(cmd)
+        filepath = ext_cmd_locator(cmd)
 
         if args is None:
             args = []
