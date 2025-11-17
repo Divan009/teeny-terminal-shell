@@ -1,7 +1,7 @@
-from typing import Any
-
-
 class CmdParser:
+    """
+    understands syntax (cmd, args, pipes).
+    """
     def parse_input(self, input_line: str):
         if not input_line.strip():
             return None
