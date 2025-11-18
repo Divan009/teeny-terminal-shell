@@ -20,8 +20,10 @@ class Shell:
         self.path = os.getenv("HISTFILE")
         self.parser = CmdParser()
         self.history = HistoryStore()
+
         if self.path:
             self.history.add_entries_from_file(self.path)
+
         self.executor = CmdExec(self.history)
 
         readline.set_completer(custom_completer)
@@ -29,21 +31,25 @@ class Shell:
 
 
     def run_shell(self):
-        while self.running:
-            try:
-                result = self._parse_user_input()
+        try:
+            while self.running:
+                try:
+                    result = self._parse_user_input()
 
-                if result is None:
-                    continue
+                    if result is None:
+                        continue
 
-                if isinstance(result, list):
-                    self.executor.execute_pipeline(result)
-                else:
-                    cmd, args = result
-                    self.executor.execute(cmd, args) # single command: (cmd, args)
-            except KeyboardInterrupt:
-                print()
-                break
+                    if isinstance(result, list):
+                        self.executor.execute_pipeline(result)
+                    else:
+                        cmd, args = result
+                        self.executor.execute(cmd, args) # single command: (cmd, args)
+                except KeyboardInterrupt:
+                    print()
+                    break
+        finally:
+            if self.path:
+                self.history.write_entries_to_file(self.path)
 
     def _parse_pipeline_cmd(self, input_lines: list[str]):
         all_input = []
@@ -83,9 +89,6 @@ class Shell:
 
             return self.parser.parse_input(input_line)
         except (EOFError, KeyboardInterrupt):
-            # Also handle EOFError just in case
-            if self.path:
-                self.history.write_entries_to_file(self.path)
             self.running = False
             return None
 
