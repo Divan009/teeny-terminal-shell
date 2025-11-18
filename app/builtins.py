@@ -62,6 +62,10 @@ class History(Command):
         self.history_store = history_store
 
     def run(self, args: list[str]):
+        """
+        :param args: ['-r', '/tmp/his.txt']
+        :return:
+        """
         entries = self.history_store.list()
         n = len(self.history_store)
         start_idx: int = 0
@@ -72,7 +76,8 @@ class History(Command):
                 if n > start_idx:
                     start_idx = n - start_idx # shift to last n entries
             except ValueError:
-                ...
+                self.history_store.add_entries_from_file(args[1])
+                return
 
         for i, entry in enumerate(entries[start_idx:], start=start_idx + 1):
             print(f"{i:5d} {entry}")
