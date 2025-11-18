@@ -17,8 +17,11 @@ class Shell:
 
     def __init__(self):
         self.running = True
+        self.path = os.getenv("HISTFILE")
         self.parser = CmdParser()
         self.history = HistoryStore()
+        if self.path:
+            self.history.add_entries_from_file(self.path)
         self.executor = CmdExec(self.history)
 
         readline.set_completer(custom_completer)
@@ -81,6 +84,8 @@ class Shell:
             return self.parser.parse_input(input_line)
         except (EOFError, KeyboardInterrupt):
             # Also handle EOFError just in case
+            if self.path:
+                self.history.write_entries_to_file(self.path)
             self.running = False
             return None
 
