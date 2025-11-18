@@ -41,8 +41,16 @@ class CmdExec:
             os.dup2(write_fd, 1)  # stdout -> pipe write
             os.close(read_fd)  # close unused
             os.close(write_fd)
-            os.execvp(cmd1, [cmd1] + args1)
-            sys.exit(1)  # if exec fails
+
+            if self.registry.is_builtin(cmd1):
+                self.registry.get(cmd1).run(args1)
+                os._exit(0)
+            else:
+                try:
+                    os.execvp(cmd1, [cmd1] + args1)
+                except FileNotFoundError:
+                    print(f"{cmd2}: command not found")
+                    os._exit(1)  # if exec fails
 
         # Fork for second command (right side)
         pid2 = os.fork()
@@ -50,8 +58,15 @@ class CmdExec:
             os.dup2(read_fd, 0)
             os.close(read_fd)
             os.close(write_fd)
-            os.execvp(cmd2, [cmd2] + args2)
-            sys.exit(1)
+            if self.registry.is_builtin(cmd2):
+                self.registry.get(cmd2).run(args2)
+                os._exit(1)
+            else:
+                try:
+                    os.execvp(cmd2, [cmd2] + args2)
+                except FileNotFoundError:
+                    print(f"{cmd2}: command not found")
+                    os._exit(1)  # if exec fails
 
         # Parent
         os.close(write_fd)
