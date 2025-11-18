@@ -4,6 +4,7 @@ import os
 import sys
 from pathlib import Path
 
+from app.history import HistoryStore
 from app.utils import ext_cmd_locator
 
 
@@ -57,8 +58,12 @@ class Exit(Command):
 
 
 class History(Command):
+    def __init__(self, history_store: HistoryStore):
+        self.history_store = history_store
+
     def run(self, args: list[str]):
-        sys.exit(0)
+        for i, entry in enumerate(self.history_store.list(), start=1):
+            print(f"{i:5d} {entry}")
 
     def name(self) -> str:
         return "history"
@@ -88,8 +93,13 @@ class Type(Command):
 
 
 class BuiltinRegistry:
-    def __init__(self):
+    def __init__(self, history_store: HistoryStore | None = None):
         self._commands: dict[str, Command] = {}
+
+        if history_store is None:
+            self._history_store = HistoryStore()
+
+        self._history_store = history_store
         self._register_cmds()
 
     def _register_cmds(self):
@@ -98,7 +108,7 @@ class BuiltinRegistry:
         self.register(Echo())
         self.register(Pwd())
         self.register(Cd())
-        self.register(History())
+        self.register(History(self._history_store))
         self.register(Type(self))
 
     def register(self, cmd: Command):

@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from app.builtins import BuiltinRegistry
+from app.history import HistoryStore
 from app.utils import ext_cmd_locator
 
 
@@ -11,8 +12,8 @@ class CmdExec:
     """
     registry: BuiltinRegistry
 
-    def __init__(self) -> None:
-        self.registry = BuiltinRegistry()
+    def __init__(self, history_store: HistoryStore) -> None:
+        self.registry = BuiltinRegistry(history_store)
 
     def execute(self, cmd: str, args: list[str]) -> int:
         if self.registry.is_builtin(cmd):

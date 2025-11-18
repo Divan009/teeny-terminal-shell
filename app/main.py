@@ -2,6 +2,7 @@ import os
 import readline
 
 from app.cmd_exec import CmdExec
+from app.history import HistoryStore
 from app.parser import CmdParser
 from app.utils import custom_completer
 
@@ -17,10 +18,12 @@ class Shell:
     def __init__(self):
         self.running = True
         self.parser = CmdParser()
-        self.executor = CmdExec()
+        self.history = HistoryStore()
+        self.executor = CmdExec(self.history)
 
         readline.set_completer(custom_completer)
         readline.parse_and_bind("tab: complete")
+
 
     def run_shell(self):
         while self.running:
@@ -48,6 +51,7 @@ class Shell:
             all_input.append(result)
         return all_input
 
+
     def _parse_user_input(self) -> Command | None | list[Command]:
         PROMPT: str = "$ "
 
@@ -63,6 +67,8 @@ class Shell:
             # Empty line: just ignore and reprompt
             if not input_line:
                 return None
+
+            self.history.add(input_line)
 
             if ">" in input_line:
                 os.system(input_line)
