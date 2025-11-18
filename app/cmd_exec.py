@@ -22,59 +22,56 @@ class CmdExec:
         return self._run_ext_cmd(cmd, args)
 
     def execute_pipeline(self, cmds: list[tuple[str, list[str]]]):
-        """
-        # pipeline: list[(cmd, args)] = [('cat', ['/tmp/foo/file']), ('wc', [])]
-        :param cmds:
-        :return:
-        """
-        if len(cmds) != 2:
-            print("Only two-command pipelines supported")
-            return None
+        if len(cmds) <= 1:
+            return
 
-        (cmd1, args1), (cmd2, args2) = cmds
+        prev_read_fd = None
+        pids: list[int] = []
 
-        read_fd, write_fd = os.pipe()
+        for i, (cmd, args) in enumerate(cmds):
+            is_last: bool = (i == len(cmds) - 1)
+            if not is_last:
+                curr_read_fd, curr_write_fd = os.pipe()
+                pid = self._fork_child(cmd, args, prev_read_fd, curr_write_fd)
+                if prev_read_fd is not None:
+                    os.close(prev_read_fd)
 
-        pid1 = os.fork()
+                prev_read_fd = curr_read_fd
+                os.close(curr_write_fd)
+            else:
+                pid = self._fork_child(cmd, args, prev_read_fd, None)
+                if prev_read_fd is not None:
+                    os.close(prev_read_fd)
 
-        if pid1 == 0: # child
-            os.dup2(write_fd, 1)  # stdout -> pipe write
-            os.close(read_fd)  # close unused
-            os.close(write_fd)
+            if pid is not None:
+                pids.append(pid)
 
-            if self.registry.is_builtin(cmd1):
-                self.registry.get(cmd1).run(args1)
+        for pid in pids:
+            os.waitpid(pid, 0)
+
+
+    def _fork_child(self, cmd, args, read_fd, write_fd) -> int:
+
+        pid = os.fork()
+
+        if pid == 0: # child
+            if write_fd is not None:
+                os.dup2(write_fd, 1)  # stdout -> pipe write
+                os.close(write_fd)
+            if read_fd is not None:
+                os.dup2(read_fd, 0) # stdin -> pipe read
+                os.close(read_fd)  # close unused
+
+            if self.registry.is_builtin(cmd):
+                self.registry.get(cmd).run(args)
                 os._exit(0)
             else:
                 try:
-                    os.execvp(cmd1, [cmd1] + args1)
+                    os.execvp(cmd, [cmd] + args)
                 except FileNotFoundError:
-                    print(f"{cmd2}: command not found")
+                    print(f"{cmd}: command not found")
                     os._exit(1)  # if exec fails
-
-        # Fork for second command (right side)
-        pid2 = os.fork()
-        if pid2 == 0:
-            os.dup2(read_fd, 0)
-            os.close(read_fd)
-            os.close(write_fd)
-            if self.registry.is_builtin(cmd2):
-                self.registry.get(cmd2).run(args2)
-                os._exit(1)
-            else:
-                try:
-                    os.execvp(cmd2, [cmd2] + args2)
-                except FileNotFoundError:
-                    print(f"{cmd2}: command not found")
-                    os._exit(1)  # if exec fails
-
-        # Parent
-        os.close(write_fd)
-        os.close(read_fd)
-
-        # Wait for both children
-        os.waitpid(pid1, 0)
-        os.waitpid(pid2, 0)
+        return pid
 
 
     def _run_ext_cmd(self, cmd: str, args: list[str]):
