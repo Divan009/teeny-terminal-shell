@@ -2,7 +2,7 @@ import os
 import stat
 from os import stat_result
 from typing import Any
-
+from app.builtins_metadata import BUILTIN_NAMES
 
 _EXTERNAL_COMMANDS: list[str] | None = None
 
@@ -83,11 +83,9 @@ def find_all_ext_cmd_in_path() -> list[str]:
     return _EXTERNAL_COMMANDS
 
 def custom_completer(text, state) -> Any | None:
-    from app.builtins import BuiltinRegistry
 
-    all_cmds_registry = BuiltinRegistry()
+    builtin_commands = BUILTIN_NAMES
     external_commands = find_all_ext_cmd_in_path()
-    builtin_commands = all_cmds_registry.list_commands()
 
     options = sorted(set(external_commands + builtin_commands))
     matches = [s for s in options if s.startswith(text)]

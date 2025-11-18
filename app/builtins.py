@@ -62,7 +62,19 @@ class History(Command):
         self.history_store = history_store
 
     def run(self, args: list[str]):
-        for i, entry in enumerate(self.history_store.list(), start=1):
+        entries = self.history_store.list()
+        n = len(self.history_store)
+        start_idx: int = 0
+
+        if args:
+            try:
+                start_idx = int(args[0])
+                if n > start_idx:
+                    start_idx = n - start_idx # shift to last n entries
+            except ValueError:
+                ...
+
+        for i, entry in enumerate(entries[start_idx:], start=start_idx + 1):
             print(f"{i:5d} {entry}")
 
     def name(self) -> str:
@@ -93,12 +105,8 @@ class Type(Command):
 
 
 class BuiltinRegistry:
-    def __init__(self, history_store: HistoryStore | None = None):
+    def __init__(self, history_store: HistoryStore):
         self._commands: dict[str, Command] = {}
-
-        if history_store is None:
-            self._history_store = HistoryStore()
-
         self._history_store = history_store
         self._register_cmds()
 
