@@ -14,16 +14,18 @@ class HistoryStore:
         return self._entries
 
     def add_entries_from_file(self, filename: str):
-        try:
-            with open(filename, "r") as f:
-                # self._entries += f.readlines() # but adds extra line
-                for line in f:
-                    line = line.rstrip("\n")
-                    if line.strip():
-                        self._entries.append(line)
+        # removed try except, bcz i want it to err out if file is not found
+        with open(filename, "r") as f:
+            # self._entries += f.readlines() # but adds extra line
+            for line in f:
+                line = line.rstrip("\n")
+                if line.strip():
+                    self._entries.append(line)
 
-        except FileNotFoundError:
-            ...
+    def write_entries_to_file(self, filename: str):
+        with open(filename, "w") as f:
+            for line in self._entries:
+                f.write(line + "\n")
 
     def __len__(self) -> int:
         return len(self._entries)

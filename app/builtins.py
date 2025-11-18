@@ -63,20 +63,30 @@ class History(Command):
 
     def run(self, args: list[str]):
         """
-        :param args: ['-r', '/tmp/his.txt']
+        :param args: ['-r/w', '/tmp/his.txt']
         :return:
         """
+        if args and args[0] == "-r":
+            if len(args) >= 2:
+                self.history_store.add_entries_from_file(args[1])
+                return
+
+        if args and args[0] == "-w":
+            if len(args) >= 2:
+                self.history_store.write_entries_to_file(args[1])
+                return
+
         entries = self.history_store.list()
-        n = len(self.history_store)
+        total = len(self.history_store)
         start_idx: int = 0
 
         if args:
             try:
-                start_idx = int(args[0])
-                if n > start_idx:
-                    start_idx = n - start_idx # shift to last n entries
-            except ValueError:
-                self.history_store.add_entries_from_file(args[1])
+                # history <n>
+                n = int(args[0])
+                if n < total:
+                    start_idx = total - n # shift to last n entries
+            except (ValueError, IndexError):
                 return
 
         for i, entry in enumerate(entries[start_idx:], start=start_idx + 1):
