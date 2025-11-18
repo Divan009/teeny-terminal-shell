@@ -1,4 +1,4 @@
-# Mini POSIX Shell (Python)
+# Mini POSIX Shell
 
 A small POSIX-style shell implemented in Python as part of the Codecrafters “Build Your Own Shell” challenge. It supports basic job control primitives, builtins, pipelines, tab completion and a history system with file persistence via `HISTFILE`.
 
