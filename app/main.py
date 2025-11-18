@@ -1,6 +1,5 @@
 import os
 import readline
-from typing import Any
 
 from app.cmd_exec import CmdExec
 from app.parser import CmdParser

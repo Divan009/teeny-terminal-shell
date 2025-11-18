@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
 import os
 import sys
+from pathlib import Path
 
 from app.utils import ext_cmd_locator
 
@@ -56,6 +56,14 @@ class Exit(Command):
         return "exit"
 
 
+class History(Command):
+    def run(self, args: list[str]):
+        sys.exit(0)
+
+    def name(self) -> str:
+        return "history"
+
+
 class Type(Command):
     def __init__(self, registry: BuiltinRegistry):
         self.registry = registry
@@ -90,6 +98,7 @@ class BuiltinRegistry:
         self.register(Echo())
         self.register(Pwd())
         self.register(Cd())
+        self.register(History())
         self.register(Type(self))
 
     def register(self, cmd: Command):
