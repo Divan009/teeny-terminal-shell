@@ -76,7 +76,11 @@ class History(Command):
                 self.history_store.write_entries_to_file(args[1])
                 return
 
-        entries = self.history_store.list()
+        if args and args[0] == "-a":
+            if len(args) >= 2:
+                self.history_store.append_entries_to_file(args[1])
+
+        entries = self.history_store.entries()
         total = len(self.history_store)
         start_idx: int = 0
 
